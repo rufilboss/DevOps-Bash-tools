@@ -1242,8 +1242,10 @@ See also [Knowledge Base notes for CI/CD](https://github.com/HariSekhon/Knowledg
 
 ### Internet Services
 
-`bin/`, `pingdom/`, `terraform/` directories:
+`bin/`, `cloudflare/`, `pingdom/`, `terraform/` directories:
 
+- `pastebin.sh` - uploads a file to <https://pastebin.com> and copies the resulting URL to your clipboard
+- `dpaste.sh` - uploads a file to <https://dpaste.com> and copies the resulting URL to your clipboard
 - `digital_ocean_api.sh` / `doapi.sh` - queries the [Digital Ocean](https://www.digitalocean.com/) API with authentication
   - see also the Digital Ocean CLI `doctl` (`install/install_doctl.sh`)
 - `atlassian_ip_ranges.sh` - lists [Atlassian](https://www.atlassian.com/)'s IPv4 and/or IPv6 cidr ranges via its API
@@ -1358,6 +1360,7 @@ See also [Knowledge Base notes for Perl](https://github.com/HariSekhon/Knowledge
 - `image_join_horizontal.sh` - joins two images left and right after matching their heights so they align correctly
 - `imageopen.sh` - opens the given image file using whatever available tool is found on Linux or Mac
 - `svg_to_png.sh` - convert an SVG image to PNG to be usable on websites that don't support SVG images like LinkedIn, Medium or Reddit
+- `avif_to_png.sh` - convert an Avif image to PNG to be usable on websites that don't support Webp images like LinkedIn
 - `webp_to_png.sh` - convert a Webp image to PNG to be usable on websites that don't support Webp images like Medium
 
 #### Audio

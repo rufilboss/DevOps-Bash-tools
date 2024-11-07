@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2024-10-06 12:20:08 +0300 (Sun, 06 Oct 2024)
+#  Date: 2024-11-06 20:51:19 +0400 (Wed, 06 Nov 2024)
 #
 #  https///github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -22,9 +22,9 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Convert a Webp image to PNG to be usable on websites that don't support Webp images like Medium
+Convert a Avif image to PNG to be usable on websites that don't support Avif images like LinkedIn
 
-Requires either ImageMagick or dwebp to be installed, attempts to them in this order if not found
+Requires ImageMagick to be installed, attempts to install it if not found
 "
 
 # used by usage() in lib/utils.sh
@@ -35,16 +35,16 @@ help_usage "$@"
 
 num_args 1 "$@"
 
-webp="$1"
+avif="$1"
 
 shopt -s nocasematch
-if ! [[ "$webp" =~ \.webp$ ]]; then
-    die "ERROR: file passed does not have an .webp file extension: $webp"
+if ! [[ "$avif" =~ \.avif$ ]]; then
+    die "ERROR: file passed does not have an .avif file extension: $avif"
 fi
 
 # because shopt -s nocasematch doesn't work on bash native string manipulation during testing
 # shellcheck disable=SC2001
-png="$(sed 's/\.webp$//i' <<< "$webp").png"
+png="$(sed 's/\.avif$//i' <<< "$avif").png"
 
 if [ -f "$png" ]; then
     die "$png already exists, aborting..."
@@ -56,16 +56,13 @@ convert(){
     if [ -f "$png" ]; then
         die "$png already exists, aborting..."
     fi
+    # can add other tools here later if wanted
     if type -P magick &>/dev/null; then
-        timestamp "Converting '$webp' to '$png' using ImageMagick"
-        magick "$webp" "$png"
-        return 0
-    elif type -P dwebp &>/dev/null; then
-        timestamp "Converting '$webp' to '$png' using dwebp"
-        dwebp "webp" -o "$png"
+        timestamp "Converting '$avif' to '$png' using ImageMagick"
+        magick "$avif" "$png"
         return 0
     fi
-    timestamp "No tool found installed to convert webp to png"
+    timestamp "No tool found installed to convert avif to png"
     return 1
 }
 
@@ -73,8 +70,9 @@ if convert; then
     converted=1
 else
     "$srcdir/../packages/install_packages.sh" imagemagick ||
-    "$srcdir/../packages/install_packages.sh" webp ||
-    die "Failed to install any of the usual tools to convert Webp to PNG"
+    # can add other tools here later if wanted
+    #"$srcdir/../packages/install_packages.sh" anothertool ||
+    die "Failed to install ImageMagick to convert Avif to PNG"
 
     if convert; then
         converted=1
