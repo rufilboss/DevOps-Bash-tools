@@ -228,7 +228,7 @@ make
   - Terraform Cloud, Octopus Deploy
   - Checkov / Bridgecrew Cloud
 - [AI & IPaaS](#ai--ipaas) - OpenAI (ChatGPT), Make.com
-- [Internet Services](#internet-services) - Cloudflare, DataDog, Digital Ocean, Kong API Gateway, GitGuardian, Jira, NGrok, Traefik, Pingdom, Wordpress
+- [Internet Services](#internet-services) - Cloudflare, DataDog, Digital Ocean, Kong API Gateway, GitGuardian, Jira, NGrok, Traefik, Pingdom, Wordpress and various pastebins and file upload sites
 - [Java](#java) - Java utilies to debug running Java programs or decompile Java JAR code for deeper debugging
 - [Python](#python) - Python utilities & library management
 - [Perl](#perl) - Perl utilities & library management
@@ -1242,10 +1242,19 @@ See also [Knowledge Base notes for CI/CD](https://github.com/HariSekhon/Knowledg
 
 ### Internet Services
 
-`bin/`, `cloudflare/`, `pingdom/`, `terraform/` directories:
+`internet/`, `cloudflare/`, `pingdom/`, `terraform/` directories:
 
-- `pastebin.sh` - uploads a file to <https://pastebin.com> and copies the resulting URL to your clipboard
-- `dpaste.sh` - uploads a file to <https://dpaste.com> and copies the resulting URL to your clipboard
+- Pastebins - uploads files and copies the resulting URL to your clipboard:
+  - code / text only - prompts to approve text / code before upload for safety:
+    - `pastebin.sh` - uploads a file to <https://pastebin.com>, script auto-determines which syntax highlighting to add since API doesn't auto infer
+    - `dpaste.sh` - uploads a file to <https://dpaste.com>, script auto-determines which syntax highlighting to add since API doesn't auto infer
+    - `termbin.sh` - uploads a file to <https://termbin.com> (site has no syntax highlighting)
+  - all files, multimedia or text / code - prompts to approve text / code before upload for safety:
+    - `0x0.sh` - uploads a file to <https://0x0.st> (fast)
+    - `imgur.sh` - uploads an image file to <https://imgur.com>
+    - `file.io.sh` - uploads a file to <https://file.io> with 2 weeks, single download retention
+    - `catbox.sh` - uploads a file to <https://catbox.moe/> with permanent retention (slow)
+    - `litterbox.sh` - uploads a file to <https://litterbox.catbox.moe/> with temporary retention (slow)
 - `digital_ocean_api.sh` / `doapi.sh` - queries the [Digital Ocean](https://www.digitalocean.com/) API with authentication
   - see also the Digital Ocean CLI `doctl` (`install/install_doctl.sh`)
 - `atlassian_ip_ranges.sh` - lists [Atlassian](https://www.atlassian.com/)'s IPv4 and/or IPv6 cidr ranges via its API
@@ -1270,6 +1279,7 @@ See also [Knowledge Base notes for CI/CD](https://github.com/HariSekhon/Knowledg
   - `cloudflare_ssl_verified_all_zones.sh` - same as above for all zones
   - `cloudflare_zones.sh` - lists Cloudflare zone names and IDs (needed for writing Terraform Cloudflare code)
 - `datadog_api.sh` - queries the [DataDog](https://www.datadoghq.com/) API with authentication
+- `dnsjson.sh` - queries [DNSJson](https://dnsjson) for DNS records
 - `gitguardian_api.sh` - queries the [GitGuardian](https://www.gitguardian.com/) API with authentication
 - `jira_api.sh` - queries [Jira](https://www.atlassian.com/software/jira) API with authentication
 - `kong_api.sh` - queries the [Kong API Gateway](https://docs.konghq.com/gateway/latest/)'s Admin API, handling authentication if enabled

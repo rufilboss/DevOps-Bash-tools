@@ -60,6 +60,8 @@ min_args 1 "$@"
 
 check_env_defined PASTEBIN_API_KEY
 
+url="https://pastebin.com/api/api_post.php"
+
 file="$1"
 expiry="${2:-${PASTEBIN_EXPIRY:-1D}}"
 private="${3:-1}"  # 1=unlisted (default), 0=public, 2=private
@@ -69,10 +71,14 @@ if ! [[ "$private" =~ ^(0|1|2)$ ]]; then
     usage "Invalid value for private arg, must be one of: 0, 1 or 2 for public, unlisted or private respectively"
 fi
 
-if ! [[ "$expiry" =~ ^[[:digit:]][[:alpha:]]$ ]]; then
+if ! [[ "$expiry" =~ ^[[:digit:]]+[[:alpha:]]$ ]]; then
     usage "Invalid value for expiry arg, must be in format: <integer><uppercase_unit_of_time_character>"
 fi
 expiry="$(tr '[:lower:]' '[:upper:]' <<< "$expiry")"
+
+if ! file "$file" | grep -q ASCII; then
+    die "This is only for text files like code. For non-text files use adjacent 0x0.sh"
+fi
 
 # Do not allow reading from stdin because it does not allow the prompt safety
 #if [ "$file" = '-' ]; then
@@ -156,16 +162,16 @@ if [ "$format" = text ]; then
     esac
 fi
 
-filename_encoded="$("$srcdir/urlencode.sh" <<< "$file")"
+filename_encoded="$("$srcdir/../bin/urlencode.sh" <<< "$file")"
 
-#content="$("$srcdir/urlencode.sh" <<< "$content" | tr -d '\n')"
+#content="$("$srcdir/../bin/urlencode.sh" <<< "$content" | tr -d '\n')"
 
 {
 # try twice, fall back to trying without the API paste format in case it is wrong as this can result in
 #
 #   Bad API request, invalid api_paste_format
 #
-command curl -X POST -sSLf https://pastebin.com/api/api_post.php \
+command curl -X POST -sSLf "$url" \
      -d "api_option=paste" \
      -d "api_dev_key=$PASTEBIN_API_KEY" \
      -d "api_paste_name=$filename_encoded" \
@@ -174,7 +180,7 @@ command curl -X POST -sSLf https://pastebin.com/api/api_post.php \
      -d "api_paste_private=$private" \
      -d "api_paste_format=$format" ||
 
-    command curl -X POST -sSLf https://pastebin.com/api/api_post.php \
+    command curl -X POST -sSLf "$url" \
          -d "api_option=paste" \
          -d "api_dev_key=$PASTEBIN_API_KEY" \
          -d "api_paste_name=$filename_encoded" \
@@ -184,7 +190,7 @@ command curl -X POST -sSLf https://pastebin.com/api/api_post.php \
 
         {
             timestamp "FAILED: repeating without the curl -f switch to get the error from the API:"
-            command curl -X POST -sSL https://pastebin.com/api/api_post.php \
+            command curl -X POST -sSL "$url" \
                  -d "api_option=paste" \
                  -d "api_dev_key=$PASTEBIN_API_KEY" \
                  -d "api_paste_name=$filename_encoded" \
@@ -196,5 +202,5 @@ command curl -X POST -sSLf https://pastebin.com/api/api_post.php \
         }
 } |
 tee /dev/stderr |
-"$srcdir/copy_to_clipboard.sh"
+"$srcdir/../bin/copy_to_clipboard.sh"
 echo

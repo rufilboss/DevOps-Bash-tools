@@ -2,8 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2010-05-18 10:40:36 +0100 (Tue, 18 May 2010)
-#  (just discovered in private repo and ported here)
+#  Date: 2024-11-07 06:06:59 +0400 (Thu, 07 Nov 2024)
 #
 #  https///github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -51,14 +50,19 @@ help_usage "$@"
 
 min_args 1 "$@"
 
+url="https://dpaste.com/api/v2/"
+
 file="$1"
 expiry="${2:-${DPASTE_EXPIRY:-1}}"
 format="${3:-text}"  # syntax highlighting
 
-if ! [[ "$expiry" =~ ^[[:digit:]]$ ]]; then
+if ! [[ "$expiry" =~ ^[[:digit:]]+$ ]]; then
     usage "Invalid value for expiry arg, must be an integer of days"
 fi
-expiry="$(tr '[:lower:]' '[:upper:]' <<< "$expiry")"
+
+if ! file "$file" | grep -q ASCII; then
+    die "This is only for text files like code. For non-text files use adjacent 0x0.sh"
+fi
 
 # Do not allow reading from stdin because it does not allow the prompt safety
 #if [ "$file" = '-' ]; then
@@ -146,25 +150,25 @@ if [ "$format" = text ]; then
     esac
 fi
 
-#filename_encoded="$("$srcdir/urlencode.sh" <<< "$file")"
+#filename_encoded="$("$srcdir/../bin/urlencode.sh" <<< "$file")"
 
-#content="$("$srcdir/urlencode.sh" <<< "$content" | tr -d '\n')"
+#content="$("$srcdir/../bin/urlencode.sh" <<< "$content" | tr -d '\n')"
 
 {
 # try twice, fall back to trying without the API syntax highlighting selection in case it is wrong as this can result in
 #
-command curl -sSLf https://dpaste.com/api/v2/ \
+command curl -sSLf "$url" \
              -F "expiry_days=$expiry" \
              -F "syntax=$format" \
              -F "content=<-" <<< "$content" ||
 
-    command curl -sSLf https://dpaste.com/api/v2/ \
+    command curl -sSLf "$url" \
                  -F "expiry_days=$expiry" \
                  -F "content=<-" <<< "$content" ||
 
         {
             timestamp "FAILED: repeating without the curl -f switch to get the error from the API:"
-            command curl -sSL https://dpaste.com/api/v2/ \
+            command curl -sSL "$url" \
                          -F "expiry_days=$expiry" \
                          -F "content=<-" <<< "$content"
             echo
@@ -172,5 +176,5 @@ command curl -sSLf https://dpaste.com/api/v2/ \
         }
 } |
 tee /dev/stderr |
-"$srcdir/copy_to_clipboard.sh"
+"$srcdir/../bin/copy_to_clipboard.sh"
 echo
