@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2024-08-27 11:28:20 +0200 (Tue, 27 Aug 2024)
+#  Date: 2024-11-13 14:42:01 +0400 (Wed, 13 Nov 2024)
 #
 #  https///github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -22,9 +22,13 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-List AWS EC2 instances, their DNS names and States in an easy to read table output
+List AWS EC2 AMIs belonging to your account in an easy to read table output
 
-Useful for quickly investigating running instances and comparing to configured FQDN addresses in referencing software
+Useful for quickly investigating AMIs
+
+For full details do:
+
+    aws ec2 describe-images --image-ids \"\$AMI_ID\"
 
 
 $usage_aws_cli_required
@@ -40,12 +44,7 @@ num_args 0 "$@"
 
 # false positive - want single quotes for * to be evaluated within AWS query not shell
 # shellcheck disable=SC2016
-aws ec2 describe-instances \
-    --query 'Reservations[*].Instances[*].[
-                Tags[?Key==`Name`].Value | [0],
-                InstanceId,
-                State.Name,
-                publicDnsName,
-                PrivateDnsName
-            ]' \
+aws ec2 describe-images \
+    --owners self \
+    --query 'Images | sort_by(@, &Name)[].{" ID":ImageId, " Name":Name, "CreationDate":CreationDate}' \
     --output table
