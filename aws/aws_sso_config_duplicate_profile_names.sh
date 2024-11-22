@@ -8,7 +8,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn
+#  and optionally send me feedback to help steer this or other code I publish
 #
 #  https://www.linkedin.com/in/HariSekhon
 #
@@ -22,11 +23,15 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Prints duplicate AWS SSO configs from the given \$AWS_CONFIG_FILE or given file argument
+Lists duplicate AWS SSO config profile names that are using the same sso_account_id
+from the given \$AWS_CONFIG_FILE or given file argument
 
-Useful to find and remove / comment out an ~/.aws/config with a mix of hand crafted and automatically generated AWS SSO configs
+Useful to find and remove / comment out an ~/.aws/config with a mix of hand crafted
+and automatically generated AWS SSO configs
 
 See also:
+
+    aws_sso_config_duplicate_sections.sh
 
     aws_sso_configs.sh - iterates and generates AWS SSO configs for all accounts your currently authenticated user has access to
 
@@ -47,22 +52,30 @@ duplicate_account_ids="$(
     grep '^[[:space:]]*sso_account_id' "$config" |
     sed 's/.*=[[:space:]]*//' |
     sort |
-    uniq -d
+    uniq -d |
+    sed '/^[[:space:]]*$/d'
 )"
 
 while read -r account_id; do
+    if is_blank "$account_id"; then
+        continue
+    fi
     if ! is_int "$account_id"; then
         die "ERROR: detected invalid AWS Account ID: $account_id"
     fi
-    #grep -10 "^[[:space:]]*sso_account_id[[:space:]]*=[[:space:]]*$account_id" "$config" |
-    #sed 's
-    #awk "
-    #/^\\[/{in_section=0}
-    #/sso_account_id[[:space:]]*=[[:space:]]*$account_id/{in_section=1}
-    #in_section{print}" "$config"
-	awk "
-		/^\\[/{section=\$0; in_section=0}
-		\$0 ~ /sso_account_id = $account_id/ {in_section=1; print section}
-		in_section && \$0 !~ /^\\[/ {print}
-	" "$config"
-done <<< "$duplicate_account_ids"
+    while read -r line; do
+        if is_blank "$line"; then
+            continue
+        elif [[ "$line" =~ ^[[:space:]]*\[.+\] ]]; then
+            section="$line"
+        elif [[ "$line" =~ ^[[:space:]]*sso_account_id[[:space:]]*=[[:space:]]*${account_id}[[:space:]]*$ ]]; then
+            echo "$section"
+        fi
+    done < "$config"
+done <<< "$duplicate_account_ids" |
+sed '
+    s/^[^[]*\[//;
+    s/^[[:space:]]*profile[[:space:]]*//;
+    s/\][^]]*$//;
+' |
+sort -fu
