@@ -458,6 +458,7 @@ Prometheus, OpenTSDB, InfluxDB etc.
   - `aws_ec2_create_ami_from_instance.sh` - creates an AWS EC2 AMI from an EC2 instance and waits for it to become available for use
   - `aws_ec2_clone_instance.sh` - clones an AWS EC2 instance by creating an AMI from the original and then booting a new instance from the AMI with the same settings as the original instance. Useful to testing risky things on a separate EC2 instance, such as Server Administrator recovery of Tableau
   - `aws_ec2_amis.sh` - list AWS EC2 AMIs belonging to your account in an easy to read table output
+  - `aws_ec2_ami_ids.sh` - lists AWS EC2 AMI IDs only, one per line, to be used in adjacent scripts that creating mapping tables and translate AMI IDs to names in inventory scripts `aws_info_ec2*.sh`
   - `aws_ec2_ebs_*.sh` - AWS EC2 [EBS](https://aws.amazon.com/ebs/) scripts:
     - `aws_ec2_ebs_volumes.sh` - list EC2 instances and their EBS volumes in the current region
     - `aws_ec2_ebs_create_snapshot_and_wait.sh - creates a snapshot of a given EBS volume ID and waits for it to complete with exponential backoff
@@ -501,6 +502,12 @@ Prometheus, OpenTSDB, InfluxDB etc.
     - `aws_iam_users_mfa_serials.sh` - lists AWS users [MFA](https://aws.amazon.com/iam/features/mfa/) serial numbers (differentiates Virtual vs Hardware MFAs)
     - `aws_iam_users_pw_last_used.sh` - lists AWS users and their password last used date
   - `aws_ip_ranges.sh` - get all AWS IP ranges for a given Region and/or Service using the IP range API
+  - `aws_info*.sh`:
+    - `aws_info_all_profiles.sh` - calls `aws_info.sh` for all AWS profiles using `aws_foreach_profile.sh`
+      - `aws_info.sh` - lists AWS deployed resources in the current or specified AWS account profile
+        - `aws_info_ec2.sh` - lists AWS EC2 Instances resources deployed in the current AWS account
+    - `aws_info_ec2_csv.sh` - lists AWS EC2 Instances in quoted CSV format in the current AWS account
+    - `aws_info_ec2_all_profiles_csv.sh` - lists AWS EC2 Instances in quoted CSV format across all configured AWS profiles for their configured region
   - `aws_eks_cloudwatch_logs.sh` - enables and fetches AWS EKS Master logs via CloudWatch
   - `aws_eks_ssh_dump_logs.sh` - fetch system logs from EKS Worker Nodes EC2 VMs (eg. for support debug requests by vendors)
   - `aws_kms_key_rotation_enabled.sh` - lists [AWS KMS](https://aws.amazon.com/kms/) keys and whether they have key rotation enabled
