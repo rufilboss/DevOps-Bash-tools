@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #  vim:ts=4:sts=4:sw=4:et
+#  shellcheck disable=SC1091
 #
 #  Author: Hari Sekhon
-#  Date: 2020-08-25 16:46:24 +0100 (Tue, 25 Aug 2020)
+#  Date: 2024-11-22 14:20:14 +0400 (Fri, 22 Nov 2024)
 #
-#  https://github.com/HariSekhon/DevOps-Bash-tools
+#  https///github.com/HariSekhon/DevOps-Bash-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -18,26 +19,35 @@ set -euo pipefail
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1090,SC1091
-. "$srcdir/lib/utils.sh"
-
-# shellcheck disable=SC1090,SC1091
-. "$srcdir/lib/gcp.sh"
+. "$srcdir/lib/aws.sh"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Gathers GCP Info across all projects
+Lists AWS deployed resources in the current or specified AWS account profile
 
-Combines gcp_foreach_project.sh and gcp_info.sh
+Written to be combined with aws_foreach_profile.sh
 
-$gcp_info_formatting_help
+
+$usage_aws_cli_required
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args=""
+usage_args="[<aws_profile>]"
 
 help_usage "$@"
 
-num_args 0 "$@"
+max_args 1 "$@"
 
-gcp_foreach_project.sh "'$srcdir/gcp_info.sh' '{id}'"
+check_bin aws
+
+if [ $# -gt 0 ]; then
+    aws_profile="$1"
+    shift || :
+    export AWS_PROFILE="$aws_profile"
+fi
+
+aws_account_id="$(aws_account_id)"
+
+"$srcdir/aws_info_ec2_csv.sh" |
+sed "s|^|\"$aws_account_id\",|"

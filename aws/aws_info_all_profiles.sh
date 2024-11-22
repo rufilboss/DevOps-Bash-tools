@@ -2,7 +2,8 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2020-08-25 16:46:24 +0100 (Tue, 25 Aug 2020)
+#  Date: 2024-11-22 14:22:54 +0400 (Fri, 22 Nov 2024)
+#  long overdue port of the adjacent GCP info scripts from years prior
 #
 #  https://github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -18,18 +19,16 @@ set -euo pipefail
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1090,SC1091
-. "$srcdir/lib/utils.sh"
-
-# shellcheck disable=SC1090,SC1091
-. "$srcdir/lib/gcp.sh"
+. "$srcdir/lib/aws.sh"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Gathers GCP Info across all projects
+Gathers AWS Info across all projects
 
-Combines gcp_foreach_project.sh and gcp_info.sh
+Combines aws_foreach_profile.sh and aws_info.sh
 
-$gcp_info_formatting_help
+
+$usage_aws_cli_required
 "
 
 # used by usage() in lib/utils.sh
@@ -40,4 +39,4 @@ help_usage "$@"
 
 num_args 0 "$@"
 
-gcp_foreach_project.sh "'$srcdir/gcp_info.sh' '{id}'"
+aws_foreach_profile.sh "'$srcdir/aws_info.sh' '{profile}'"

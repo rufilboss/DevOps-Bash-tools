@@ -26,6 +26,10 @@ List AWS EC2 instances, their DNS names and States in an easy to read table outp
 
 Useful for quickly investigating running instances and comparing to configured FQDN addresses in referencing software
 
+See also:
+
+    aws_ec2_info.sh - gives similar info but also resolves AMI names and adds an architecture column
+    aws_ec2_info_csv.sh - same as above but in quoted CSV format
 
 $usage_aws_cli_required
 "
@@ -45,9 +49,10 @@ num_args 0 "$@"
 # in the middle instead of end since AWS CLI seems to sort the columns lexically
 aws ec2 describe-instances \
     --query 'Reservations[*].Instances[*].{
-                " Name": Tags[?Key==`Name`].Value | [0],
-                " ID": InstanceId,
-                " State": State.Name,
+                "  Name": Tags[?Key==`Name`].Value | [0],
+                "  ID": InstanceId,
+                "  State": State.Name,
+                " InstanceType": InstanceType,
                 "Public DNS": publicDnsName,
                 "Private DNS": PrivateDnsName
             }' \

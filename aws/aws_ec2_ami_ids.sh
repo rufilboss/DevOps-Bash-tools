@@ -22,13 +22,15 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-List AWS EC2 AMIs belonging to your account in an easy to read table output
+List AWS EC2 AMI IDs in use in the current or given AWS account, one per line for processing in other scripts
 
-Useful for quickly investigating AMIs
+Used by:
 
-For full details do:
+    aws_info_ec2*.sh
 
-    aws ec2 describe-images --image-ids \"\$AMI_ID\"
+See also:
+
+    aws_ec2_amis.sh
 
 
 $usage_aws_cli_required
@@ -40,7 +42,7 @@ usage_args="[<aws_profile>]"
 
 help_usage "$@"
 
-max_args 1 "$@"
+num_args 0 "$@"
 
 if [ $# -gt 0 ]; then
     aws_profile="$1"
@@ -51,7 +53,9 @@ fi
 
 # false positive - want single quotes for * to be evaluated within AWS query not shell
 # shellcheck disable=SC2016
-aws ec2 describe-images \
-    --owners self \
-    --query 'Images | sort_by(@, &Name)[].{" ID":ImageId, " Name":Name, "CreationDate":CreationDate}' \
-    --output table
+aws ec2 describe-instances \
+    --query 'Reservations[*].Instances[*].ImageId' \
+    --output text |
+tr '[:space:]' '\n' |
+sort -u |
+sed '/^[[:space:]]*$/d'
