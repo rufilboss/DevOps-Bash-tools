@@ -430,6 +430,7 @@ Prometheus, OpenTSDB, InfluxDB etc.
 `aws/` directory:
 
 - [AWS](https://aws.amazon.com/) scripts - `aws_*.sh`:
+  - `aws_profile.sh` - switches to an AWS Profile given as an arg or prompts the user with a convenient interactive menu list of AWS profiles to choose from - useful when you have lots of AWS work profiles
   - `aws_cli_create_credential.sh` - creates an AWS service account user for CI/CD or CLI with Admin permissions (or other group or policy), creates an AWS Access Key, saves a credentials CSV and even prints the shell export commands and aws credentials file config to configure your environment to start using it. Useful trick to avoid CLI reauth to `aws sso login` every day.
   - `aws_terraform_create_credential.sh` - creates a AWS terraform service account with Administrator permissions for Terraform Cloud or other CI/CD systems to run Terraform plan and apply, since no CI/CD systems can work with AWS SSO workflows. Stores the access key as both CSV and prints shell export commands and credentials file config as above
   - `.envrc-aws` - copy to `.envrc` for [direnv](https://direnv.net/) to auto-load AWS configuration settings such as AWS Profile, Compute Region, EKS cluster kubectl context etc.
@@ -530,6 +531,7 @@ Prometheus, OpenTSDB, InfluxDB etc.
   - `aws_sso_config_duplicate_profile_names.sh` - lists duplicate AWS SSO config profile names that are using the same sso_account_id
   - `aws_sso_env_creds.sh` - retrieves AWS SSO session credentials in the format of environment export commands for copying to other systems like Terraform Cloud
   - `aws_profile_config_add_if_missing.sh` - reads AWS profile config blocks from stdin and appends them to the `~/.aws/config` file if the profile section is not found
+  - `aws_profile_generate_direnvs.sh` - generates subdirectories containing the `config.ini` and `.envrc` for every AWS profile found in the given file or `$AWS_CONFIG_FILE` or `~/.aws/config`. Useful to take a large generated AWS `config.ini` from `aws_sso_configs.sh` and then split it into subdirectories for direnvs
   - `aws_s3_bucket.sh` - creates an S3 bucket, blocks public access, enables versioning, encryption, and optionally locks out any given user/group/role ARNs via a bucket policy for safety (eg. to stop Power Users accessing a sensitive bucket like Terraform state)
   - `aws_s3_buckets_block_public_access.sh` - blocks public access to one or more given S3 buckets or files containing bucket names, one per line
   - `aws_s3_account_block_public_access.sh` - blocks S3 public access at the AWS account level
@@ -814,6 +816,9 @@ See also [Knowledge Base notes for Docker](https://github.com/HariSekhon/Knowled
 - `csv_header_indices.sh` - list CSV headers with their zero indexed numbers, useful reference when coding against
   column positions
 - `ini_config_add_if_missing.sh` - reads INI config blocks from stdin and appends them to the specified file if the section is not found. Used by `aws_profile_config_add_if_missing.sh`
+- `ini_config_duplicate_sections.sh` - lists duplicate INI config sections that are using the same value for a given key in the given .ini file
+- `ini_config_duplicate_section_names.sh` - lists duplicate INI config section names that are using the same value for a given key in the given .ini file
+- `ini_grep_section.sh` - prints the named section from a given .ini file to stdout
 - `wordcount.sh` - counts and ranks words by their frequency in file(s) or stdin
 - Data format validation `validate_*.py` from [DevOps Python Tools repo](https://github.com/HariSekhon/DevOps-Python-tools):
 

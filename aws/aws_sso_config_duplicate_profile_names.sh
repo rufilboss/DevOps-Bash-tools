@@ -24,7 +24,7 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC2034,SC2154
 usage_description="
 Lists duplicate AWS SSO config profile names that are using the same sso_account_id
-from the given \$AWS_CONFIG_FILE or given file argument
+from the given file or \$AWS_CONFIG_FILE
 
 Useful to find and remove / comment out an ~/.aws/config with a mix of hand crafted
 and automatically generated AWS SSO configs
@@ -48,8 +48,12 @@ max_args 1 "$@"
 
 config="${1:-${AWS_CONFIG_FILE:-$HOME/.aws/config}}"
 
+if ! [ -f "$config" ]; then
+    die "ERROR: file does not exist: $config"
+fi
+
 duplicate_account_ids="$(
-    grep '^[[:space:]]*sso_account_id' "$config" |
+    grep '^[[:space:]]*sso_account_id[[:space:]]*=' "$config" |
     sed 's/.*=[[:space:]]*//' |
     sort |
     uniq -d |

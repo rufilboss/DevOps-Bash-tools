@@ -22,37 +22,32 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Lists duplicate AWS SSO config sections that are using the same sso_account_id
-from the given file or \$AWS_CONFIG_FILE
-
-Useful to find and remove / comment out an ~/.aws/config with a mix of hand crafted
-and automatically generated AWS SSO configs
-
-See also:
-
-    aws_sso_config_duplicate_profile_names.sh
-
-    aws_sso_configs.sh - iterates and generates AWS SSO configs for all accounts your currently authenticated user has access to
-
-    aws_sso_configs_save.sh - saves each the above generated configs to ~/.aws/config if they don't already exist by profile name
+Lists duplicate INI config sections that are using the same value for a given key
+in the given .ini file
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<aws_config_file>]"
+usage_args="<file> <key>"
 
 help_usage "$@"
 
-max_args 1 "$@"
+num_args 2 "$@"
 
-config="${1:-${AWS_CONFIG_FILE:-$HOME/.aws/config}}"
+file="$1"
+key="$2"
 
-if ! [ -f "$config" ]; then
-    die "ERROR: file does not exist: $config"
+if ! [ -f "$file" ]; then
+    die "ERROR: file does not exist: $file"
 fi
 
-duplicate_account_ids="$(
-    grep '^[[:space:]]*sso_account_id[[:space:]]*=' "$config" |
+# check the given key actually exists somewhere
+if ! grep -q "^[[:space:]]*${key}[[:space:]]*=" "$file"; then
+    die "ERROR: given key '$key' was not found in the file: $file"
+fi
+
+duplicate_key_values="$(
+    grep "^[[:space:]]*${key}[[:space:]]*=" "$file" |
     sed 's/.*=[[:space:]]*//' |
     sort |
     uniq -d |
@@ -61,12 +56,9 @@ duplicate_account_ids="$(
 
 section=""
 
-while read -r account_id; do
-    if is_blank "$account_id"; then
+while read -r value; do
+    if is_blank "$value"; then
         continue
-    fi
-    if ! is_int "$account_id"; then
-        die "ERROR: detected invalid AWS Account ID: $account_id"
     fi
     found=0
     while read -r line; do
@@ -83,15 +75,9 @@ while read -r account_id; do
         else
             section+="
 $line"
-            if [[ "$line" =~ ^[[:space:]]*sso_account_id[[:space:]]*=[[:space:]]*${account_id}[[:space:]]*$ ]]; then
+            if [[ "$line" =~ ^[[:space:]]*${key}[[:space:]]*=[[:space:]]*${value}[[:space:]]*$ ]]; then
                 found=1
             fi
         fi
-    done < "$config"
-    if [ "$found" = 1 ]; then
-        echo "$section"
-        section=""
-        echo
-        found=0
-    fi
-done <<< "$duplicate_account_ids"
+    done < "$file"
+done <<< "$duplicate_key_values"
