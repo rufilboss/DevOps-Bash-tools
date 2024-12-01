@@ -61,12 +61,15 @@ while read -r profile; do
     if ! [ -f "$subconfig" ]; then
         timestamp "Generating $subconfig"
         cat > "$subconfig" <<EOF
-# generated using ${0##*/} from:
+#!/usr/bin/env bash
+#
+# Generated using ${0##*/} from:
 #
 #   https://github.com/HariSekhon/DevOps-Bash-tools
 
 EOF
         "$srcdir/../data/ini_grep_section.sh" "profile $profile" "$config" >> "$subconfig"
+        sed -i '' -e '${/^$/d}' "$subconfig"
         if ! [ -s "$subconfig" ]; then
             die "Failed to generate $subconfig"
         fi
@@ -81,7 +84,7 @@ EOF
         #echo "export AWS_ACCOUNT_ID=$aws_account_id" >> "$envrc"
         timestamp "Generating $envrc" # with AWS_PROFILE=$profile"
         cat >> "$envrc" <<EOF
-# generated using ${0##*/} from:
+# Generated using ${0##*/} from:
 #
 #   https://github.com/HariSekhon/DevOps-Bash-tools
 
@@ -89,6 +92,13 @@ export AWS_PROFILE=$profile
 
 #export EKS_CLUSTER=
 #export EKS_NAMESPACE=
+
+# if copying this .envrc to terraform / terragrunt directories in a different part of the repo:
+#
+#git_root="$(git rev-parse --show-toplevel)"
+#
+# shellcheck disable=SC1091
+#. "\$git_root/aws/.envrc"
 
 . ../.envrc
 EOF
