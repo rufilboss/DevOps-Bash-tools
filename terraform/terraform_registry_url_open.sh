@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2020-10-06 18:59:32 +0100 (Tue, 06 Oct 2020)
+#  Date: Thu Dec 5 00:39:05 2024 +0700
 #
 #  https://github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -22,11 +22,15 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Opens the URL given as an arg, or first URL from standard input or a given file
+Opens the Terraform Registry URL in either tfr:// or https://registry.terraform.io/ format
+
+URL can be given as a string arg, file or standard input
+
+If the given arg is a file, then opens the first Terraform URL found in the file
 
 Used by .vimrc to instantly open a URL on the given line in the editor
 
-Very useful for quickly referencing inline documentation links found throughout my GitHub repos
+Very useful for quickly referencing Terraform documentation for modules defined in Terraform code
 "
 
 # used by usage() in lib/utils.sh
@@ -37,24 +41,16 @@ help_usage "$@"
 
 max_args 1 "$@"
 
-browse(){
-    local url="$1"
-    if is_mac; then
-        open "$url"
-    else  # assume Linux
-        if type -P xdg-open &>/dev/null; then
-            xdg-open "$url" &
-        elif type -P gnome-open &>/dev/null; then
-            gnome-open "$url" &
-        else
-            die "ERROR: xdg-open and gnome-open not found"
-        fi
-    fi
-}
+#if "$srcdir/terraform_registry_url_extract.sh" "$@" |
+#    sed 's|tfr://registry.terraform.io/|https://registry.terraform.io/modules/|; s|$|/latest|g'
+#    then
+#    timestamp "Found Terraform Registry URL(s)"
+#elif "$srcdir/../bin/urlextract.sh" "$@"; then
+#    timestamp "Found URL(s)"
+#fi |
 
-"$srcdir/urlextract.sh" "$@" |
+"$srcdir/terraform_registry_url_extract.sh" "$@" |
+"$srcdir/terraform_registry_url_to_https.sh" |
 # head -n1 because grep -m 1 can't be trusted and sometimes outputs more matches on subsequent lines
 head -n1 |
-while read -r url; do
-    browse "$url"
-done
+"$srcdir/../bin/urlopen.sh"

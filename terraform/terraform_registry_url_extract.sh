@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2020-10-06 18:59:32 +0100 (Tue, 06 Oct 2020)
+#  Date: 2024-12-05 00:26:53 +0700 (Thu, 05 Dec 2024)
 #
 #  https://github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -22,12 +22,19 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Extracts the URLs from a given string arg, file or standard input
+Extracts the Terraform Registry URLs in either tfr:// or https://registry.terraform.io/ format
+from a given string, file or standard input
+
+Useful to fast load Terraform Module documentation via editor/IDE hotkeys
+
+See advanced .vimc in this repo
+
+Based on ../bin/urlextract.sh
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<url_or_file_with_url>]"
+usage_args="[<string_or_file_with_url>]"
 
 help_usage "$@"
 
@@ -43,5 +50,7 @@ else
     echo "$arg"
 fi |
 # [] break the regex match, even when escaped \[\]
-grep -Eo 'https?://[[:alnum:]./?&!$#%@*;:+~_=-]+' ||
-die "No URLs found"
+grep -Eom 1 \
+     -e 'tfr://[[:alnum:]./?&!$#%@*;:+~_=-]+' \
+     -e 'https://registry.terraform.io/[[:alnum:]./?&!$#%@*;:+~_=-]*' ||
+die "No Terraform Registry URLs found"

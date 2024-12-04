@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2020-10-06 18:59:32 +0100 (Tue, 06 Oct 2020)
+#  Date: Thu Dec 5 00:39:05 2024 +0700
 #
 #  https://github.com/HariSekhon/DevOps-Bash-tools
 #
@@ -22,12 +22,18 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Extracts the URLs from a given string arg, file or standard input
+Converts one or more Terraform Registry URLs from tfr:// to https://registry.terraform.io/ format
+
+URLs can be given as a string argument, file or standard input containing URLs
+
+Used by .vimrc to convert tfr:// URLs found in a file to HTTPS format to present in a menu
+
+Very useful for quickly referencing Terraform documentation for modules defined in Terraform code
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<url_or_file_with_url>]"
+usage_args="[<tfr_url_or_file_with_tfr_urls>]"
 
 help_usage "$@"
 
@@ -42,6 +48,4 @@ elif [ -f "$arg" ]; then
 else
     echo "$arg"
 fi |
-# [] break the regex match, even when escaped \[\]
-grep -Eo 'https?://[[:alnum:]./?&!$#%@*;:+~_=-]+' ||
-die "No URLs found"
+sed 's|tfr://registry.terraform.io/|https://registry.terraform.io/modules/|; s|$|/latest|g'
