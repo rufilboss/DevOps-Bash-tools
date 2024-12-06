@@ -28,6 +28,12 @@ Useful to prevent a screensaver kicking in on a Remote Desktop connection which 
 applied that doesn't let you disable the screensaver
 
 Sleeps for 10 seconds between mouse movements
+
+UPDATE: it turns out this doesn't stop Windows Virtual Desktop from going to screensaver.
+
+WORKAROUND: find a safe area in your WVD session to click without any effect, then Cmd-Tab to Terminal and run this:
+
+    mouse_clicks_remote_desktop.sh
 "
 
 # used by usage() in lib/utils.sh
