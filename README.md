@@ -326,6 +326,7 @@ Top-level `.bashrc` and `.bash.d/` directory:
 - `find_broken_links.sh` - find broken links with delays to avoid tripping defenses
 - `find_broken_symlinks.sh` - find broken symlinks pointing to non-existent files/directories
 - `find_lock.sh` - tries to find if a lockfile is used in the given or current working directory by taking snapshots of the file list before and after a prompt in which you should open/close an application
+- `foreach_path_bin.sh` - runs each binary of the given name found in `$PATH` with the args given. Useful to find all the installed versions of a program in different paths eg. `~/bin/` vs `/usr/local/bin/` eg. `foreach_path_bin.sh terraform --version`
 - `http_duplicate_urls.sh` - find duplicate URLs in a given web page
 - `ldapsearch.sh` - shortens `ldapsearch` command by inferring switches from environment variables
 - `ldap_user_recurse.sh` / `ldap_group_recurse.sh` - recurse Active Directory LDAP users upwards to find all parent groups, or groups downwards to find all nested users (useful for debugging LDAP integration and group-based permissions)
@@ -519,6 +520,7 @@ Prometheus, OpenTSDB, InfluxDB etc.
     - `aws_info_ec2_all_profiles_csv.sh` - lists AWS EC2 Instances in quoted CSV format across all configured AWS profiles for their configured region
   - `aws_eks_cloudwatch_logs.sh` - enables and fetches AWS EKS Master logs via CloudWatch
   - `aws_eks_ssh_dump_logs.sh` - fetch system logs from EKS Worker Nodes EC2 VMs (eg. for support debug requests by vendors)
+  - `aws_eks_cluster_versions.sh` - iterates EKS clusters to list each AWS EKS cluster name and version in the current account. Combine with `aws_foreach_profile.sh` and `aws_foreach_region.sh` to audit your EKS cluster versions across accounts and regions
   - `aws_eks_addon_versions.sh` - lists the EKS addon versions available for the given cluster by checking its version before checking addons
   - `aws_eks_available_ips.sh` - lists the number of available IP addresses in the EKS subnets for the given cluster (5 required for an EKS upgrade)
   - `aws_kms_key_rotation_enabled.sh` - lists [AWS KMS](https://aws.amazon.com/kms/) keys and whether they have key rotation enabled
