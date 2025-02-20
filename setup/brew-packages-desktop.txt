@@ -42,6 +42,7 @@ amazon-ecs-cli
 #amazon-sam-cli  # no longer found
 ansible
 ansible-lint
+aria2  # optionally used by xcodes for downloading, supports resuming and segmented downloading
 archey4  # displays system info in text
 argocd
 asciinema  # records terminal to asciicast
@@ -312,9 +313,11 @@ watch
 watchexec  # run commands when files change
 #wget  # in brew-packages.txt
 #whois  # in brew-packages.txt
+#windows-app  # replaces microsoft-remote-desktop
 wireshark  # only install tshark CLI, must --cask for Wireshark
 #webp
 xclip
+xcodesorg/made/xcodes
 #x264
 #x265
 #xvid
