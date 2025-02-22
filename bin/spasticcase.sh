@@ -51,5 +51,5 @@ else
     fi
 fi |
 capitalize_alternate |
-tee /dev/stderr |
-"$srcdir/copy_to_clipboard.sh"
+tee >("$srcdir/copy_to_clipboard.sh") /dev/stdout
+# copies to clipboard and also sends to stdout to allow further pipeline processing
